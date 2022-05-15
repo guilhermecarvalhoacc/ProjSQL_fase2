@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Cria o URL do database para o SQLAlchemy
-DATABASE_URL = "mysql+mysqlconnector://megadados:megadados123@localhost:3306/teste_orm"
+DATABASE_URL = "mysql+mysqlconnector://megadados:megadados123@localhost:3306/shopcart"
 
 # Cria o engine do SQLAlchemy
 engine = create_engine(DATABASE_URL)
