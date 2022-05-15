@@ -2,8 +2,8 @@ DROP DATABASE IF EXISTS shopcart;
 CREATE DATABASE shopcart;
 USE shopcart;
 
-DROP TABLE IF EXISTS Product;
-CREATE TABLE Product(
+DROP TABLE IF EXISTS product;
+CREATE TABLE product(
 id_product INT AUTO_INCREMENT,
 name VARCHAR(50) NOT NULL,
 description VARCHAR(500),
@@ -15,21 +15,21 @@ url_img VARCHAR(50),
 PRIMARY KEY (id_product)
 );
 
-DROP TABLE IF EXISTS Cart;
-CREATE TABLE Cart(
+DROP TABLE IF EXISTS cart;
+CREATE TABLE cart(
 id_cart INT NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id_cart)
 );
 
-DROP TABLE IF EXISTS CartProduct;
-CREATE TABLE CartProduct(
+DROP TABLE IF EXISTS cartproduct;
+CREATE TABLE cartproduct(
 id_cartproduct INT NOT NULL AUTO_INCREMENT,
 id_cart INT NOT NULL,
 id_product INT NOT NULL,
 quantity INT NOT NULL,
 PRIMARY KEY (id_cartproduct),
 CONSTRAINT fk_product FOREIGN KEY (id_product)
-        REFERENCES Product (id_product),
+        REFERENCES product (id_product),
 CONSTRAINT fk_cart FOREIGN KEY (id_cart)
-        REFERENCES Cart (id_cart)
+        REFERENCES cart (id_cart)
 );
