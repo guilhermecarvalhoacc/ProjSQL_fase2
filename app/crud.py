@@ -41,7 +41,7 @@ def del_cart(db: Session, id_cart:int):
     return None
 
 def add_to_cart(db: Session, cartproduct: schemas.CartProductCreate):
-    cart = models.CartProduct(id_cart=cartproduct.id_cart,id_product=cartproduct.id_product,quantity=cartproduct.quantity)
+    db_cartproduct = models.CartProduct(id_cart=cartproduct.id_cart,id_product=cartproduct.id_product,quantity=cartproduct.quantity)
     db.add(db_cartproduct)
     db.commit()
     db.refresh(db_cartproduct)
