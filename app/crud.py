@@ -10,13 +10,13 @@ import models, schemas
 # delete cart - FEITO
 # read cart - FEITO
 # read carts - FEITO
-# add to cart
-# remove from cart
+# add to cart - FEITO
+# remove from cart - FEITO
 
 # INVENTORY --------------------------------
 # create product - FEITO
 # read product - FEITO
-# update product 
+# update product - FEITO
 # delete product - FEITO
 # read inventory - FEITO
 
