@@ -33,3 +33,4 @@ FOREIGN KEY (id_product)
 FOREIGN KEY (id_cart)
         REFERENCES Cart(id_cart)
 );
+
