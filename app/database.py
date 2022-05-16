@@ -2,9 +2,22 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  
+
+
+
+USER = os.getenv("USER")
+PASSWORD = os.getenv("PASSWORD")
+
 
 # Cria o URL do database para o SQLAlchemy
-DATABASE_URL = "mysql+mysqlconnector://megadados:megadados123@localhost:3306/shopcart"
+DATABASE_URL = f"mysql+mysqlconnector://{USER}:{PASSWORD}@localhost:3306/shopcart"
+
+print(f"url is {DATABASE_URL}")
+
 
 # Cria o engine do SQLAlchemy
 engine = create_engine(DATABASE_URL)
