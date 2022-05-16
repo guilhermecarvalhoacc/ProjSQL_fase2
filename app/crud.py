@@ -12,11 +12,12 @@ import models, schemas
 # read carts - FEITO E FUNCIONANDO
 # add to cart - 
 # remove from cart - 
+# update cart - FEITO E FUNCIONANDO
 
 # INVENTORY --------------------------------
 # create product - FEITO E FUNCIONANDO
 # read product - FEITO E FUNCIONANDO
-# update product 
+# update product - FEITO E FUNCIONANDO
 # delete product - FEITO E FUNCIONANDO
 # read inventory - FEITO E FUNCIONANDO
 
@@ -48,18 +49,27 @@ def del_cart(db: Session, id_cart:int):
         return db_cart
     return
 
-def add_to_cart(db: Session, cartproduct: schemas.CartProductCreate):
-    db_cartproduct = models.CartProduct(id_cart=cartproduct.id_cart,id_product=cartproduct.id_product,quantity=cartproduct.quantity)
-    db.add(db_cartproduct)
-    db.commit()
-    db.refresh(db_cartproduct)
-    return db_cartproduct
+# ok
+def update_cart(db: Session, id_cart:int, cart: schemas.CartUpdate):
+    db_cart = db.query(models.Cart).filter(models.Cart.id_cart == id_cart)
+    if db_cart:
+        db_cart.update(cart)
+        db.commit()
+        return db_cart.first()
+    return
+
+# def add_to_cart(db: Session, id_cart, product: schemas.Product):
+#     db_cart = get_cart(db, id_cart)
+#     db.add(db_cartproduct)
+#     db.commit()
+#     db.refresh(db_cartproduct)
+#     return db_cartproduct
 
 
-def remove_from_cart(db: Session, id_cartproduct:int):
-    db.delete(db.cartproduct).where(db.cartproduct.id_cartproduct == id_cartproduct) #https://docs.sqlalchemy.org/en/14/core/dml.html
-    db.commit()
-    return None
+# def remove_from_cart(db: Session, id_cartproduct:int):
+#     db.delete(db.cartproduct).where(db.cartproduct.id_cartproduct == id_cartproduct) #https://docs.sqlalchemy.org/en/14/core/dml.html
+#     db.commit()
+#     return None
 
 # Product -----------------------------------------------------------
 
@@ -88,10 +98,13 @@ def del_product(db: Session, id_product:int):
         return db_product
     return
 
-    
-def update_product(db: Session, id_product:int, newqtd: int):
-    db.update(db.product).where(db.product.id_product == id_product).values(quantity = newqtd) #https://docs.sqlalchemy.org/en/14/core/dml.html
-    db.commit()
-    return None
+# ok  
+def update_product(db: Session, id_product:int, product: schemas.ProductUpdate):
+    db_product = db.query(models.Product).filter(models.Product.id_product == id_product)
+    if db_product:
+        db_product.update(product)
+        db.commit()
+        return db_product.first()
+    return
 
 

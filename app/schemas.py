@@ -16,6 +16,16 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
+class ProductUpdate(ProductBase):
+    name: str                             
+    description: Optional[str]  
+    brand: Optional[str]   
+    price: float 
+    discount: Optional[float]      
+    quantity: float 
+    url_img: Optional[str] 
+
+
 
 class Product(ProductBase):
     id_product: int
@@ -26,6 +36,9 @@ class Product(ProductBase):
 
 # Cart ---------------------------------------------------
 class CartBase(BaseModel):
+    id_user: int
+
+class CartUpdate(CartBase):
     id_user: int
 
 class CartCreate(CartBase):
@@ -39,66 +52,3 @@ class Cart(CartBase):
         orm_mode = True
 
 
-# # Product ------------------------------------------------
-# class ProductBase(BaseModel):
-#     name: str
-#     description: Optional[str] = None
-#     brand: str
-#     price: float
-#     discount: float
-#     quantity: int
-#     url_img:
-
-
-# class ProductCreate(ProductBase):
-#     pass
-
-
-# class Product(ProductBase):
-#     id_product: int
-#     class Config:
-#         orm_mode = True
-
-# # Cart ---------------------------------------------------
-# class CarttBase(BaseModel):
-#     id_cart: int
-#     id_user: int
-#     carts: 
-
-# class CartCreate(ProductBase):
-#     pass
-
-
-
-# class ItemBase(BaseModel):
-#     title: str
-#     description: Optional[str] = None
-
-
-# class ItemCreate(ItemBase):
-#     pass
-
-
-# class Item(ItemBase):
-#     id: int
-#     owner_id: int
-
-#     class Config:
-#         orm_mode = True
-
-
-# class UserBase(BaseModel):
-#     email: str
-
-
-# class UserCreate(UserBase):
-#     password: str
-
-
-# class User(UserBase):
-#     id: int
-#     is_active: bool
-#     items: List[Item] = []
-
-#     class Config:
-#         orm_mode = True

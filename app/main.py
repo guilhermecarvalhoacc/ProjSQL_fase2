@@ -5,7 +5,7 @@ import uvicorn
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI, HTTPException, status, Path
 
-from . import models, schemas
+#from . import models, schemas
 import models, schemas, crud
 from database import engine, SessionLocal
 
@@ -35,7 +35,6 @@ def root():
 def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
     return crud.create_cart(db=db, cart=cart)
 
-
 # ADICIONAL - ler carrinho de compras - OK
 @app.get("/cart/{cart_id}", tags=["Cart"])
 async def read_cart(id_cart: int, db: Session = Depends(get_db)):
@@ -43,8 +42,6 @@ async def read_cart(id_cart: int, db: Session = Depends(get_db)):
     if not db_cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     return db_cart
-    
-
 
 # ADICIONAL - ler carrinhos de compras existentes - OK
 @app.get("/carts/", tags=["Cart"])
@@ -61,6 +58,27 @@ def delete_cart(id_cart: int = Path(..., title="The ID of the cart to get", ge=0
     if not cart:
         return HTTPException(status_code=404, detail="Cart not found")
     return {"message": "Cart removed"}
+
+# update carrinho de compras - OK
+@app.put("/cart/{id_cart}", tags=['Cart'])
+def update_cart(id_cart: int, cart: schemas.CartUpdate, db: Session = Depends(get_db)):
+    cart = crud.update_cart(db, id_cart, cart )
+    if not cart:
+        return HTTPException(status_code=404, detail="Cart not found")
+    return {"message": "Cart Updated"}
+
+# adicionar item ao carrinho de compras
+# envia dados pelo request body
+@app.patch("/cart/{id_cart}/product", tags=['Cart'])
+def add_to_cart(id_cart:int, product: schemas.Product, db: Session = Depends(get_db)):
+    #crud.add_to_cart(db, id_cart, product)
+    return 
+
+# remover item carrinho de compras 
+# envia dados pelo request body
+@app.patch("/cart/{id_cart}/product/{id_product}", tags=['Cart'])
+def remove_from_cart(id_cart:int, id_product: int, db: Session = Depends(get_db)):
+    return 
 
 # Product -------------------------------------------------------------------
 # criar carrinho de compras - OK 
@@ -90,31 +108,19 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
     product = crud.del_product(db, id_product=id_product)
     if not product:
         return HTTPException(status_code=404, detail="Product not found")
-    return {"message": "Cart removed"}
+    return {"message": "Product removed"}
 
-# alterar produto do inventario
+# alterar produto do inventario - OK 
 # envia o que quer alterar pelo request body
-@app.patch("/inventory/{product_id}")
-def update_product(product_id: int, product: schemas.ProductBase, db: Session = Depends(get_db)):
-    #product = crud.update_product()
-    return 
+@app.put("/inventory/{id_product}", tags=['Inventory'])
+def update_product(id_product: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
+    product = crud.update_product(db, id_product, product )
+    if not product:
+        return HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product Updated"}
 
 
 
-# # adicionar item ao carrinho de compras
-# # envia dados pelo request body
-# @app.patch("/cart/{cart_id}/product")
-# async def add_to_cart(cart_id:int, product: Product):
-    
-#     update_json(cart_id, product,"carts.json","carts", 1, product.product_id)
-#     return 
-
-# # remover item carrinho de compras 
-# # como defino a quantidade de itens que vou remover?
-# @app.delete("/cart/{cart_id}/product/{product_id}")
-# async def remove_from_cart(cart_id:int, product_id: int):
-#     remove_from_json(cart_id,"carts.json", "carts", "product",  1, product_id )
-#     return 
 
 
 
