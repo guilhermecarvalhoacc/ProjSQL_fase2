@@ -71,7 +71,7 @@ def add_to_cart(db: Session, id_cart:int, cartproduct: schemas.Product):
 #    return db_cart
 
 
- def remove_from_cart(db: Session, id_cart:int, id_product:int):
+def remove_from_cart(db: Session, id_cart:int, id_product:int):
      db.delete(db.cartproduct).where(db.cartproduct.id_cart == id_cart and db.cartproduct.id_product == id_product) #https://docs.sqlalchemy.org/en/14/core/dml.html
      db.commit()
      return None
