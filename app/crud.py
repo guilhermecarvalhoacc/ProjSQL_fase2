@@ -58,12 +58,12 @@ def update_cart(db: Session, id_cart:int, cart: schemas.CartUpdate):
         return db_cart.first()
     return
 
-# def add_to_cart(db: Session, id_cart, product: schemas.Product):
-#     db_cart = get_cart(db, id_cart)
-#     db.add(db_cartproduct)
-#     db.commit()
-#     db.refresh(db_cartproduct)
-#     return db_cartproduct
+def add_to_cart(db: Session, id_cart, product: schemas.Product):
+    db_cart = get_cart(db, id_cart)
+    db.add(db_cart)
+    db.commit()
+    db.refresh(db_cart)
+    return db_cart
 
 
 # def remove_from_cart(db: Session, id_cartproduct:int):
