@@ -4,6 +4,7 @@ import uvicorn
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI, HTTPException, status
 
+from . import models, schemas
 import models, schemas, crud
 from database import engine, SessionLocal
 
@@ -32,6 +33,26 @@ async def root():
 @app.post("/cart/", response_model=schemas.Cart, status_code=status.HTTP_201_CREATED) 
 async def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
     return crud.create_cart(db=db, cart=cart)
+
+
+# # deletar carrinho de compras - OK
+@app.delete("/cart/{cart_id}", response_model=Cart)
+async def delete_cart(*, cart_id: int = Path(..., title="The ID of the cart to get", ge=0)):
+    return crud.del_cart(db=db, cart=cart)
+
+
+
+
+
+def get_products(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(CartProduct.products_cart).offset(skip).limit(limit).all()
+
+
+# # deletar carrinho de compras - OK
+# @app.delete("/cart/{cart_id}", response_model=Cart)
+# async def delete_cart(*, cart_id: int = Path(..., title="The ID of the cart to get", ge=0)):
+#     remove_from_json(cart_id,"carts.json", "carts", "cart", 0)
+#     return 
 
 # @app.post("/users/", response_model=schemas.User)
 # def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
