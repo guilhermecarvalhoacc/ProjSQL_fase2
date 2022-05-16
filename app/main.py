@@ -5,6 +5,7 @@ import uvicorn
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI, HTTPException, status, Path
 
+from . import models, schemas
 import models, schemas, crud
 from database import engine, SessionLocal
 
@@ -34,6 +35,7 @@ def root():
 def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
     return crud.create_cart(db=db, cart=cart)
 
+
 # ADICIONAL - ler carrinho de compras - OK
 @app.get("/cart/{cart_id}", tags=["Cart"])
 async def read_cart(id_cart: int, db: Session = Depends(get_db)):
@@ -42,6 +44,7 @@ async def read_cart(id_cart: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cart not found")
     return db_cart
     
+
 
 # ADICIONAL - ler carrinhos de compras existentes - OK
 @app.get("/carts/", tags=["Cart"])

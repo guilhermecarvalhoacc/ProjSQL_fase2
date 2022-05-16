@@ -20,6 +20,7 @@ import models, schemas
 # delete product - FEITO E FUNCIONANDO
 # read inventory - FEITO E FUNCIONANDO
 
+
 # Cart -----------------------------------------------------------
 
 # ok
@@ -47,6 +48,18 @@ def del_cart(db: Session, id_cart:int):
         return db_cart
     return
 
+def add_to_cart(db: Session, cartproduct: schemas.CartProductCreate):
+    db_cartproduct = models.CartProduct(id_cart=cartproduct.id_cart,id_product=cartproduct.id_product,quantity=cartproduct.quantity)
+    db.add(db_cartproduct)
+    db.commit()
+    db.refresh(db_cartproduct)
+    return db_cartproduct
+
+
+def remove_from_cart(db: Session, id_cartproduct:int):
+    db.delete(db.cartproduct).where(db.cartproduct.id_cartproduct == id_cartproduct) #https://docs.sqlalchemy.org/en/14/core/dml.html
+    db.commit()
+    return None
 
 # Product -----------------------------------------------------------
 
@@ -74,3 +87,11 @@ def del_product(db: Session, id_product:int):
         db.commit()
         return db_product
     return
+
+    
+def update_product(db: Session, id_product:int, newqtd: int):
+    db.update(db.product).where(db.product.id_product == id_product).values(quantity = newqtd) #https://docs.sqlalchemy.org/en/14/core/dml.html
+    db.commit()
+    return None
+
+
