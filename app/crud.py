@@ -6,22 +6,24 @@ import models, schemas
 
 # !!! PRECISA FAZER !!!
 # CART ------------------------------------
-# create cart - FEITO
-# delete cart - FEITO
-# read cart - FEITO
-# read carts - FEITO
-# add to cart - FEITO
-# remove from cart - FEITO
+# create cart - FEITO E FUNCIONANDO
+# delete cart - FEITO E FUNCIONANDO
+# read cart - FEITO E FUNCIONANDO
+# read carts - FEITO E FUNCIONANDO
+# add to cart - 
+# remove from cart - 
 
 # INVENTORY --------------------------------
-# create product - FEITO
-# read product - FEITO
-# update product - FEITO
-# delete product - FEITO
-# read inventory - FEITO
+# create product - FEITO E FUNCIONANDO
+# read product - FEITO E FUNCIONANDO
+# update product 
+# delete product - FEITO E FUNCIONANDO
+# read inventory - FEITO E FUNCIONANDO
+
 
 # Cart -----------------------------------------------------------
 
+# ok
 def create_cart(db: Session, cart: schemas.CartCreate):
     db_cart = models.Cart(**cart.dict())
     db.add(db_cart)
@@ -29,16 +31,22 @@ def create_cart(db: Session, cart: schemas.CartCreate):
     db.refresh(db_cart)
     return db_cart
 
+# ok
 def get_cart(db: Session, id_cart: int):
-    return db.query(models.cart).filter(models.cart.id_cart == id_cart).first()
+    return db.query(models.Cart).filter(models.Cart.id_cart == id_cart).first()
 
+# ok
 def get_carts(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.cart).offset(skip).limit(limit).all()
+    return db.query(models.Cart).offset(skip).limit(limit).all()
 
+# ok
 def del_cart(db: Session, id_cart:int):
-    db.delete(db.cart).where(db.cart.id_cart == id_cart) #https://docs.sqlalchemy.org/en/14/core/dml.html
-    db.commit()
-    return None
+    db_cart = get_cart(db, id_cart)
+    if db_cart:
+        db.delete(db_cart)
+        db.commit()
+        return db_cart
+    return
 
 def add_to_cart(db: Session, cartproduct: schemas.CartProductCreate):
     db_cartproduct = models.CartProduct(id_cart=cartproduct.id_cart,id_product=cartproduct.id_product,quantity=cartproduct.quantity)
@@ -55,58 +63,35 @@ def remove_from_cart(db: Session, id_cartproduct:int):
 
 # Product -----------------------------------------------------------
 
+# ok
 def create_product(db: Session, product: schemas.ProductCreate):
-    db_product = models.Product(quantity=product.quantity)
+    db_product = models.Product(**product.dict())
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
     return db_product
 
+# ok
 def get_product(db: Session, id_product: int):
-    return db.query(models.product).filter(models.cart.id_product == id_product).first()
+    return db.query(models.Product).filter(models.Product.id_product == id_product).first()
 
+# ok
 def get_products(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.product).offset(skip).limit(limit).all()
+    return db.query(models.Product).offset(skip).limit(limit).all()
 
+# ok
 def del_product(db: Session, id_product:int):
-    db.delete(db.product).where(db.product.id_product == id_product) #https://docs.sqlalchemy.org/en/14/core/dml.html
-    db.commit()
-    return None
+    db_product = get_product(db, id_product)
+    if db_product:
+        db.delete(db_product)
+        db.commit()
+        return db_product
+    return
 
-
+    
 def update_product(db: Session, id_product:int, newqtd: int):
     db.update(db.product).where(db.product.id_product == id_product).values(quantity = newqtd) #https://docs.sqlalchemy.org/en/14/core/dml.html
     db.commit()
     return None
 
-# def get_user(db: Session, user_id: int):
-#     return db.query(models.User).filter(models.User.id == user_id).first()
 
-
-# def get_user_by_email(db: Session, email: str):
-#     return db.query(models.User).filter(models.User.email == email).first()
-
-
-# def get_users(db: Session, skip: int = 0, limit: int = 100):
-#     return db.query(models.User).offset(skip).limit(limit).all()
-
-
-# def create_user(db: Session, user: schemas.UserCreate):
-#     fake_hashed_password = user.password + "notreallyhashed"
-#     db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
-
-
-# def get_items(db: Session, skip: int = 0, limit: int = 100):
-#     return db.query(models.Item).offset(skip).limit(limit).all()
-
-
-# def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-#     db_item = models.Item(**item.dict(), owner_id=user_id)
-#     db.add(db_item)
-#     db.commit()
-#     db.refresh(db_item)
-#     return db_item

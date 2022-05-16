@@ -1,8 +1,9 @@
 from typing import List
+from urllib import response
 
 import uvicorn
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Path
 
 from . import models, schemas
 import models, schemas, crud
@@ -23,69 +24,82 @@ def get_db():
 
 
 # root - OK
-@app.get("/")
-async def root():
+@app.get("/", tags=['Root'])
+def root():
     return {"Message": "Welcome to The Shop Cart"}
 
 
 # Cart -------------------------------------------------------------------
 # criar carrinho de compras - OK 
-@app.post("/cart/", response_model=schemas.Cart, status_code=status.HTTP_201_CREATED) 
-async def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
+@app.post("/cart/", response_model=schemas.Cart, status_code=status.HTTP_201_CREATED, tags=["Cart"]) 
+def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
     return crud.create_cart(db=db, cart=cart)
 
 
-# # deletar carrinho de compras - OK
-@app.delete("/cart/{cart_id}", response_model=Cart)
-async def delete_cart(*, cart_id: int = Path(..., title="The ID of the cart to get", ge=0)):
-    return crud.del_cart(db=db, cart=cart)
-
-
-
-
-
-def get_products(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(CartProduct.products_cart).offset(skip).limit(limit).all()
-
-
-# # deletar carrinho de compras - OK
-# @app.delete("/cart/{cart_id}", response_model=Cart)
-# async def delete_cart(*, cart_id: int = Path(..., title="The ID of the cart to get", ge=0)):
-#     remove_from_json(cart_id,"carts.json", "carts", "cart", 0)
-#     return 
-
-# @app.post("/users/", response_model=schemas.User)
-# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     db_user = crud.get_user_by_email(db, email=user.email)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Email already registered")
-#     return crud.create_user(db=db, user=user)
-
-# # deletar carrinho de compras - OK
-# @app.delete("/cart/{cart_id}", response_model=Cart)
-# async def delete_cart(*, cart_id: int = Path(..., title="The ID of the cart to get", ge=0)):
-#     remove_from_json(cart_id,"carts.json", "carts", "cart", 0)
-#     return 
-
-# # ADICIONAL - ler carrinho de compras - OK
-# @app.get("/cart/{cart_id}")
-# async def read_cart(*, cart_id: int):
-#     carts = read_json("carts.json", "carts")
-
-#     for cart in carts:
-#         if cart["cart_id"] == cart_id:
-#             return cart
-    
-#     return {"message": "Not Found"}
+# ADICIONAL - ler carrinho de compras - OK
+@app.get("/cart/{cart_id}", tags=["Cart"])
+async def read_cart(id_cart: int, db: Session = Depends(get_db)):
+    db_cart = crud.get_cart(db, id_cart=id_cart)
+    if not db_cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    return db_cart
     
 
-# # ADICIONAL - ler carrinhos de compras existentes - OK
-# @app.get("/carts/")
-# async def read_carts():
-#     carts = read_json("carts.json", "carts")
-#     if len(carts) == 0:
-#         return {"message": "No Carts Yet"}
-#     return {"Carts Avaiable": carts}
+
+# ADICIONAL - ler carrinhos de compras existentes - OK
+@app.get("/carts/", tags=["Cart"])
+async def read_carts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    carts = crud.get_carts(db, skip=skip, limit=limit)
+    if not carts:
+        raise HTTPException(status_code=404, detail="No carts yet")
+    return carts
+
+# deletar carrinho de compras - OK
+@app.delete("/cart/{id_cart}", tags=['Cart'])
+def delete_cart(id_cart: int = Path(..., title="The ID of the cart to get", ge=0), db: Session = Depends(get_db)):
+    cart = crud.del_cart(db, id_cart=id_cart)
+    if not cart:
+        return HTTPException(status_code=404, detail="Cart not found")
+    return {"message": "Cart removed"}
+
+# Product -------------------------------------------------------------------
+# criar carrinho de compras - OK 
+@app.post("/inventory/", response_model=schemas.Product, status_code=status.HTTP_201_CREATED, tags=['Inventory']) 
+def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    return crud.create_product(db=db, product=product)
+
+# consultar produto em inventario de produtos - OK
+@app.get("/inventory/{id_product}", response_model=schemas.Product, tags=['Inventory']) 
+def read_product(id_product: int, db: Session = Depends(get_db)):
+    db_product = crud.get_product(db, id_product = id_product)
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+# consultar inventario de produtos - OK
+@app.get("/inventory/", tags=['Inventory'])
+def read_all_inventory(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    all_products = crud.get_products(db, skip=skip, limit=limit)
+    if not all_products:
+        return HTTPException(status_code=404, detail="No products yet")
+    return all_products
+
+# remover produto do inventario - OK
+@app.delete("/inventory/{id_product}", tags=['Inventory'])
+def delete_product(id_product: int, db: Session = Depends(get_db)):
+    product = crud.del_product(db, id_product=id_product)
+    if not product:
+        return HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Cart removed"}
+
+# alterar produto do inventario
+# envia o que quer alterar pelo request body
+@app.patch("/inventory/{product_id}")
+def update_product(product_id: int, product: schemas.ProductBase, db: Session = Depends(get_db)):
+    #product = crud.update_product()
+    return 
+
+
 
 # # adicionar item ao carrinho de compras
 # # envia dados pelo request body
@@ -102,42 +116,10 @@ def get_products(db: Session, skip: int = 0, limit: int = 100):
 #     remove_from_json(cart_id,"carts.json", "carts", "product",  1, product_id )
 #     return 
 
-# # criar produto
-# # envia dados pelo request body - OK
-# @app.post("/inventory/", status_code=status.HTTP_201_CREATED)
-# async def create_product(product: Product_without_id):
-#     append_json(product, "inventory.json", "inventory", "product")
-#     return product
 
-# # consultar inventario de produtos - OK
-# @app.get("/inventory/")
-# async def read_all_inventory():
-#     all_products = read_json("inventory.json", "inventory")
 
-#     return all_products
 
-# # consultar produto em inventario de produtos - OK
-# @app.get("/inventory/{product_id}") 
-# async def read_product(*, product_id: int):
-#     all_products = read_json("inventory.json", "inventory")
-#     for p in all_products:
-#         if p["product_id"] == product_id:
-#             return p
-    
-#     return {"message": "Not Found"}
 
-# # alterar produto do inventario
-# # envia o que quer alterar pelo request body
-# @app.patch("/inventory/{product_id}")
-# async def update_product(product_id: int, product: Product):
-#     update_json(product_id, product,"inventory.json","inventory", 0)
-#     return 
-
-# # remover produto do inventario - OK
-# @app.delete("/inventory/{product_id}")
-# async def delete_product(product_id: int):
-#     remove_from_json(product_id, "inventory.json", "inventory", "product", 0)
-#     return 
 
 # exemplos --------------------------------------------------
 # @app.get("/users/", response_model=List[schemas.User])
@@ -146,12 +128,6 @@ def get_products(db: Session, skip: int = 0, limit: int = 100):
 #     return users
 
 
-# @app.get("/users/{user_id}", response_model=schemas.User)
-# def read_user(user_id: int, db: Session = Depends(get_db)):
-#     db_user = crud.get_user(db, user_id=user_id)
-#     if not db_user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return db_user
 
 
 # @app.post("/users/{user_id}/items/", response_model=schemas.Item)
@@ -160,8 +136,3 @@ def get_products(db: Session, skip: int = 0, limit: int = 100):
 # ):
 #     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
-
-# @app.get("/items/", response_model=List[schemas.Item])
-# def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-#     items = crud.get_items(db, skip=skip, limit=limit)
-#     return items
