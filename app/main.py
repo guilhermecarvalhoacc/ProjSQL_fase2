@@ -70,13 +70,13 @@ def update_cart(id_cart: int, cart: schemas.CartUpdate, db: Session = Depends(ge
 # adicionar item ao carrinho de compras
 # envia dados pelo request body
 @app.patch("/cart/{id_cart}/product", tags=['Cart'])
-def add_to_cart(id_cart:int, product: schemas.Product, db: Session = Depends(get_db)):
-    return crud.add_to_cart(db, id_cart, product)
+def add_to_cart(id_cart:int, cartproduct: schemas.CartProduct, db: Session = Depends(get_db)):
+    return crud.add_to_cart(db, id_cart, cartproduct)
 
 # remover item carrinho de compras 
 # envia dados pelo request body
 @app.patch("/cart/{id_cart}/product/{id_product}", tags=['Cart'])
-def remove_from_cart(id_cart:int, id_product: int, db: Session = Depends(get_db)):
+def remove_from_cart(id_cart:int, id_product:int, db: Session = Depends(get_db)):
     return 
 
 # Product -------------------------------------------------------------------
