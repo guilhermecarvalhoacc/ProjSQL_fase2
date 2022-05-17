@@ -67,7 +67,8 @@ class CartProductCreate(CartProductBase):
     pass
 
 class CartProduct(CartProductBase):
-    id_cartproduct: int
+    id_cart: int
+    id_product: int
 
     class Config:
         orm_mode = True

@@ -58,12 +58,14 @@ def update_cart(db: Session, id_cart:int, cart: schemas.CartUpdate):
         return db_cart.first()
     return
 
-def add_to_cart(db: Session, id_cart:int, cartproduct: schemas.Product):
+def add_to_cart(db: Session,cartproduct: schemas.CartProductCreate):
         db_cartproduct = models.CartProduct(**cartproduct.dict())
         db.add(db_cartproduct)
         db.commit()
         db.refresh(db_cartproduct)
-        return db_cart
+        return db_cartproduct
+
+
 #    db_cart = get_cart(db, id_cart)
 #    db.add(db_cart)
 #    db.commit()
