@@ -14,8 +14,8 @@ PASSWORD = os.getenv("PASSWORD")
 
 
 # Cria o URL do database para o SQLAlchemy
-#DATABASE_URL = f"mysql+mysqlconnector://{USER}:{PASSWORD}@localhost:3306/shopcart"
-DATABASE_URL = f"mysql+mysqlconnector://megadados:megadados123@localhost:3306/shopcart"
+DATABASE_URL = f"mysql+mysqlconnector://{USER}:{PASSWORD}@localhost:3306/shopcart"
+
 
 print(f"url is {DATABASE_URL}")
 
