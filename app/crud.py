@@ -58,18 +58,25 @@ def update_cart(db: Session, id_cart:int, cart: schemas.CartUpdate):
         return db_cart.first()
     return
 
-# def add_to_cart(db: Session, id_cart, product: schemas.Product):
-#     db_cart = get_cart(db, id_cart)
-#     db.add(db_cartproduct)
-#     db.commit()
-#     db.refresh(db_cartproduct)
-#     return db_cartproduct
+def add_to_cart(db: Session,cartproduct: schemas.CartProductCreate):
+        db_cartproduct = models.CartProduct(**cartproduct.dict())
+        db.add(db_cartproduct)
+        db.commit()
+        db.refresh(db_cartproduct)
+        return db_cartproduct
 
 
-# def remove_from_cart(db: Session, id_cartproduct:int):
-#     db.delete(db.cartproduct).where(db.cartproduct.id_cartproduct == id_cartproduct) #https://docs.sqlalchemy.org/en/14/core/dml.html
-#     db.commit()
-#     return None
+#    db_cart = get_cart(db, id_cart)
+#    db.add(db_cart)
+#    db.commit()
+#    db.refresh(db_cart)
+#    return db_cart
+
+
+def remove_from_cart(db: Session, id_cart:int, id_product:int):
+     db.delete(db.cartproduct).where(db.cartproduct.id_cart == id_cart and db.cartproduct.id_product == id_product) #https://docs.sqlalchemy.org/en/14/core/dml.html
+     db.commit()
+     return None
 
 # Product -----------------------------------------------------------
 

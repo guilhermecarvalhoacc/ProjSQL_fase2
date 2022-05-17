@@ -51,4 +51,24 @@ class Cart(CartBase):
     class Config:
         orm_mode = True
 
+# CartProduct ---------------------------------------------------
 
+class CartProductBase(BaseModel):
+    id_cart: int
+    id_product: int
+    quantity: int
+
+class CartProductUpdate(CartProductBase):
+    id_cart: int
+    id_product: int
+    quantity: int
+
+class CartProductCreate(CartProductBase):
+    pass
+
+class CartProduct(CartProductBase):
+    id_cart: int
+    id_product: int
+
+    class Config:
+        orm_mode = True
