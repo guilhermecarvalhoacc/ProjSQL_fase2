@@ -58,25 +58,39 @@ def update_cart(db: Session, id_cart:int, cart: schemas.CartUpdate):
         return db_cart.first()
     return
 
-def add_to_cart(db: Session,cartproduct: schemas.CartProductCreate):
-        db_cartproduct = models.CartProduct(**cartproduct.dict())
-        db.add(db_cartproduct)
-        db.commit()
-        db.refresh(db_cartproduct)
-        return db_cartproduct
+def add_to_cart_product(db: Session, id_product: int, id_cart:int, qtde: int):
+    db_cart_product = models.CartProduct(id_cart = id_cart, id_product = id_product, quantity = qtde )
+    if not get_product(db, id_product):
+        return {"message": "Product not in inventory"}
+    if not get_cart(db, id_cart):
+        return {"message": "Cart not found"}
+    print(db_cart_product.products_cart)
+    db.add(db_cart_product)
+    db.commit()
+    db.refresh(db_cart_product)
+    return db_cart_product
 
+def read_products_from_cart(db: Session, id_cart:int):
+    cart = get_cart(db,id_cart)
+    if not cart:
+        return -1
+    products = db.query(models.CartProduct).filter(models.CartProduct.id_cart == id_cart).all()
+    return products
 
-#    db_cart = get_cart(db, id_cart)
-#    db.add(db_cart)
-#    db.commit()
-#    db.refresh(db_cart)
-#    return db_cart
 
 
 def remove_from_cart(db: Session, id_cart:int, id_product:int):
-     db.delete(db.cartproduct).where(db.cartproduct.id_cart == id_cart and db.cartproduct.id_product == id_product) #https://docs.sqlalchemy.org/en/14/core/dml.html
-     db.commit()
-     return None
+    db_cart_product = db.query(models.CartProduct).filter(models.CartProduct.id_cart == id_cart).filter(models.CartProduct.id_product == id_product).first()
+    if not get_product(db, id_product):
+        return {"message": "Product not in inventory"}
+    if not get_cart(db, id_cart):
+        return {"message": "Cart not found"}
+    if db_cart_product:
+        print(db_cart_product)
+        db.delete(db_cart_product)
+        db.commit()
+        return db_cart_product
+
 
 # Product -----------------------------------------------------------
 
