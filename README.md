@@ -1,6 +1,6 @@
 "# ProjSQL_fase2" 
 
-# Descrção
+# Descrição
 Projeto de criação de uma API para simular um carrinho de compras usando banco de dados com mysql,fastAPI e SQLAlchemy
 
 
