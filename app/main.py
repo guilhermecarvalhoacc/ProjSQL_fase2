@@ -2,6 +2,8 @@ from typing import List
 from urllib import response
 
 import uvicorn
+from sqlalchemy import exc
+
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI, HTTPException, status, Path
 
@@ -37,19 +39,27 @@ def create_cart(cart: schemas.CartCreate, db: Session = Depends(get_db)):
 
 # ADICIONAL - ler carrinho de compras - OK
 @app.get("/cart/{cart_id}", tags=["Cart"])
-async def read_cart(id_cart: int, db: Session = Depends(get_db)):
+def read_cart(id_cart: int, db: Session = Depends(get_db)):
     db_cart = crud.get_cart(db, id_cart=id_cart)
     if not db_cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-    return db_cart
+    products = crud.read_products_from_cart(db, id_cart)
+    return {"id_cart": db_cart.id_cart, "id_user": db_cart.id_cart, "products": products}
 
 # ADICIONAL - ler carrinhos de compras existentes - OK
 @app.get("/carts/", tags=["Cart"])
-async def read_carts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_carts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     carts = crud.get_carts(db, skip=skip, limit=limit)
     if not carts:
         raise HTTPException(status_code=404, detail="No carts yet")
-    return carts
+    print(len(carts))
+    carts_list = {"carts": []}
+    for cart in carts:
+        print("oba    ",cart)
+        products = crud.read_products_from_cart(db, cart.id_cart)
+        carts_list["carts"].append({"id_cart": cart.id_cart, "id_user": cart.id_cart, "products": products})
+    return carts_list
+    
 
 # deletar carrinho de compras - OK
 @app.delete("/cart/{id_cart}", tags=['Cart'])
@@ -70,14 +80,28 @@ def update_cart(id_cart: int, cart: schemas.CartUpdate, db: Session = Depends(ge
 # adicionar item ao carrinho de compras
 # envia dados pelo request body
 @app.post("/cart/{id_cart}/product", tags=['Cart'])
-def add_to_cart(id_cart:int, cartproduct: schemas.CartProductCreate, db: Session = Depends(get_db)):
-    return crud.add_to_cart(db, cartproduct)
+def add_to_cart(id_cart:int, id_product: int, qtde: int, db: Session = Depends(get_db)):
+    try:
+        crud.add_to_cart_product(db, id_product, id_cart, qtde)
+        return {"message": "Product added with success"}
+    except exc.IntegrityError:
+        return {"message": "Product already added to cart"}
+
+# read products from cart
+@app.get("/cart/{id_cart}/products", tags=["Cart"])
+def read_products_from_cart(id_cart: int, db: Session = Depends(get_db)):
+    products = crud.read_products_from_cart(db, id_cart)
+    if products == -1:
+        raise HTTPException(status_code=404, detail="Cart not found")
+    if not products:
+        raise HTTPException(status_code=404, detail="No product in the cart yet")
+    return products
 
 # remover item carrinho de compras 
 # envia dados pelo request body
 @app.delete("/cart/{id_cart}/product/{id_product}", tags=['Cart'])
 def remove_from_cart(id_cart:int, id_product:int, db: Session = Depends(get_db)):
-    return 
+    return crud.remove_from_cart(db, id_cart, id_product)
 
 # Product -------------------------------------------------------------------
 # criar carrinho de compras - OK 
